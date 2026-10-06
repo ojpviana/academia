@@ -9,3 +9,29 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer utilities {
+    .modal-body-scroll {
+        max-height: 85vh;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Global Dark Mode Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1e293b;
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 8px;
+    border: 2px solid #1e293b;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}

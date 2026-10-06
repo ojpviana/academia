@@ -55,6 +55,11 @@ class Atleta extends Model
         return $this->belongsTo(FormaPagamento::class, 'forma_pagamento_id');
     }
 
+        public function pagamentos()
+    {
+        return $this->hasMany(AlunoPagamento::class, 'atleta_id', 'idAtleta');
+    }
+
     public function turmas()
     {
         return $this->belongsToMany(Turma::class, 'atleta_turma', 'atleta_id', 'turma_id');

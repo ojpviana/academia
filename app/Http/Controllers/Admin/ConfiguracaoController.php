@@ -15,8 +15,9 @@ class ConfiguracaoController extends Controller
         $planos = Plano::orderBy('nome')->get();
         $formasPagamento = FormaPagamento::orderBy('nome')->get();
         $horarioFuncionamento = Configuracao::getValor('horario_funcionamento', '06:00 Ã s 22:00');
+        $turnos = \App\Models\Turno::orderBy('hora_inicio')->get();
         
-        return view('admin.configuracoes', compact('planos', 'formasPagamento', 'horarioFuncionamento'));
+        return view('admin.configuracoes', compact('planos', 'formasPagamento', 'horarioFuncionamento', 'turnos'));
     }
 
     public function salvarHorario(Request $request)
@@ -93,5 +94,21 @@ class ConfiguracaoController extends Controller
     {
         FormaPagamento::findOrFail($id)->delete();
         return back()->with('success', 'Forma de pagamento removida.');
+    }
+    public function storeTurno(Request $request)
+    {
+        $request->validate([
+            'nome_turno' => 'required|string|max:100',
+            'hora_inicio' => 'required|date_format:H:i',
+            'hora_fim' => 'required|date_format:H:i',
+        ]);
+        \App\Models\Turno::create($request->only('nome_turno', 'hora_inicio', 'hora_fim'));
+        return back()->with('success', 'Turno criado com sucesso!');
+    }
+
+    public function destroyTurno($id)
+    {
+        \App\Models\Turno::destroy($id);
+        return back()->with('success', 'Turno excluído com sucesso!');
     }
 }

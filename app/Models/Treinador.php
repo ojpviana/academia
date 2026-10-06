@@ -13,7 +13,7 @@ class Treinador extends Model
     protected $fillable = [
         'user_id', 'cpf', 'rg', 'data_nascimento', 'telefone',
         'endereco_completo', 'cref', 'funcao', 'tipo_vinculo',
-        'turno_horario', 'modelo_remuneracao', 'dados_bancarios'
+        'turno_id', 'salario', 'data_ultimo_pagamento', 'turno_horario', 'modelo_remuneracao', 'dados_bancarios'
     ];
 
     // ESTA É A RELAÇÃO QUE ESTÁ FALTANDO

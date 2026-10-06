@@ -17,9 +17,9 @@ class DashboardController extends Controller
         $filtro = $request->query('status', 'ativos');
 
         if ($filtro == 'inativos') {
-            $atletas = Atleta::with('user')->where('excluido', 1)->get();
+            $atletas = Atleta::onlyTrashed()->with(['user', 'plano', 'pagamentos'])->get();
         } else {
-            $atletas = Atleta::with('user')->where('excluido', 0)->get();
+            $atletas = Atleta::with(['user', 'plano', 'pagamentos'])->get();
         }
 
         $receitaMensal = \App\Models\AlunoPagamento::whereMonth('data_pagamento', Carbon::now()->month)
@@ -37,7 +37,7 @@ class DashboardController extends Controller
     public function radar()
     {
         $seteDiasAtras = Carbon::now()->subDays(7);
-        $alunosAtivos = Atleta::where('excluido', 0)
+        $alunosAtivos = Atleta::query()
             ->where('status', 'Ativo')
             ->withCount(['frequencias' => function ($query) use ($seteDiasAtras) {
                 $query->where('data_hora_entrada', '>=', $seteDiasAtras);

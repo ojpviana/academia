@@ -41,7 +41,14 @@
 
                 <div class="flex-col space-y-1 px-2 mt-2">
                     @forelse($alunosPresentes as $atleta)
-                        <button onclick="carregarAlunoPelaLista('{{ $atleta->idAtleta }}', '{{ $atleta->nome }}')" class="w-full flex items-center px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-orange-400 rounded-lg transition-all border border-transparent hover:border-slate-700">
+                        @php
+    $obj = $atleta->objetivo;
+    if (!$obj && is_array($atleta->anamnese) && isset($atleta->anamnese['objetivo'])) {
+        $obj = $atleta->anamnese['objetivo'];
+    }
+    $obj = $obj ?: 'N�o definido';
+@endphp
+<button onclick="carregarAlunoPelaLista('{{ $atleta->idAtleta }}', '{{ $atleta->nome }}', '{{ addslashes($obj) }}')" class="w-full flex items-center px-3 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-orange-400 rounded-lg transition-all border border-transparent hover:border-slate-700">
                             <div class="w-2 h-2 rounded-full bg-green-500 mr-3 animate-pulse"></div>
                             <span class="truncate capitalize">{{ $atleta->nome }}</span>
                         </button>
@@ -111,7 +118,14 @@
 
                             <ul id="dropdownAtletasTreinador" class="absolute z-[101] w-full bg-slate-800 border border-slate-600 mt-1 rounded-lg shadow-2xl max-h-48 overflow-y-auto hidden">
                                 @foreach($atletas as $atleta)
-                                    <li class="px-4 py-3 hover:bg-slate-700 cursor-pointer text-slate-300 font-medium border-b border-slate-700/50 last:border-0 transition-colors" data-id="{{ $atleta->idAtleta }}" data-nome="{{ strtolower($atleta->nome) }}">
+                                    @php
+    $obj = $atleta->objetivo;
+    if (!$obj && is_array($atleta->anamnese) && isset($atleta->anamnese['objetivo'])) {
+        $obj = $atleta->anamnese['objetivo'];
+    }
+    $obj = $obj ?: 'N�o definido';
+@endphp
+<li class="px-4 py-3 hover:bg-slate-700 cursor-pointer text-slate-300 font-medium border-b border-slate-700/50 last:border-0 transition-colors" data-id="{{ $atleta->idAtleta }}" data-nome="{{ strtolower($atleta->nome) }}" data-objetivo="{{ htmlspecialchars($obj, ENT_QUOTES) }}">
                                         {{ $atleta->nome }}
                                     </li>
                                 @endforeach
@@ -159,6 +173,7 @@
                     <div class="bg-slate-700/30 px-4 md:px-8 py-4 md:py-5 border-b border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
                         <h2 class="font-bold text-white text-base md:text-lg">2. Ficha Atual do Aluno</h2>
                         <div class="flex items-center space-x-3">
+                            <span id="objetivo-aluno-label" class="hidden bg-indigo-900 text-indigo-300 border border-indigo-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold truncate max-w-full"><svg class="w-3 h-3 md:w-4 md:h-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> <span class="obj-text"></span></span>
                             <span id="nome-aluno-label" class="bg-slate-700 text-slate-400 border border-slate-600 px-3 py-1 rounded-full text-xs md:text-sm font-bold truncate max-w-full">Nenhum selecionado</span>
                             <button id="btn-Avaliações" onclick="abrirModalAvaliacao()" class="hidden bg-orange-600 hover:bg-orange-500 text-white px-4 py-1.5 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-orange-900/20">Avalia�es</button>
                         </div>
@@ -320,7 +335,7 @@
 
                 <!-- Hist�rico de Avalia�es -->
                 <div class="flex flex-col border-t lg:border-t-0 lg:border-l border-slate-700 lg:pl-8 pt-8 lg:pt-0">
-                    <h3 class="font-bold text-white mb-4 text-base border-b border-slate-700 pb-2">Hist�rico (Mais Recentes)</h3>
+                    <h3 class="font-bold text-white mb-4 text-base border-b border-slate-700 pb-2">Histórico (Mais Recentes)</h3>
                     <div id="lista-Avaliações-modal" class="flex-1 overflow-y-auto pr-2 space-y-4">
                         <!-- Conteǧdo injetado via JS -->
                     </div>
@@ -412,6 +427,8 @@
                         dropdown.classList.add('hidden');
 
                         // Executa o AJAX automaticamente ao clicar no nome
+                        const obj = this.getAttribute('data-objetivo') || 'N�o definido';
+                        const objLabel = document.getElementById('objetivo-aluno-label'); if(objLabel) { objLabel.classList.remove('hidden'); objLabel.querySelector('.obj-text').innerText = 'Alvo: ' + obj; }
                         carregarTreinos(hiddenInput.value, nomeSelecionado);
                     });
                 });
@@ -428,14 +445,15 @@
             const urlAtletaId = urlParams.get('atleta');
             const urlAtletaNome = urlParams.get('nome');
             if (urlAtletaId && urlAtletaNome) {
-                carregarAlunoPelaLista(urlAtletaId, urlAtletaNome);
+                carregarAlunoPelaLista(urlAtletaId, urlAtletaNome, urlParams.get('objetivo') || 'N�o definido');
             }
         });
 
         // ----------------------------------------------------
         // FUN�ǟO: CARREGA ALUNO PELA LISTA DA SIDEBAR
         // ----------------------------------------------------
-        function carregarAlunoPelaLista(atletaId, atletaNome) {
+        function carregarAlunoPelaLista(atletaId, atletaNome, objetivo = 'N�o definido') {
+            const objLabel = document.getElementById('objetivo-aluno-label'); if(objLabel) { objLabel.classList.remove('hidden'); objLabel.querySelector('.obj-text').innerText = 'Alvo: ' + objetivo; }
             // Atualiza os inputs do form
             const searchInput = document.getElementById('searchAtletaTreinador');
             const hiddenInput = document.getElementById('atletaIdTreinador');
@@ -611,7 +629,7 @@
 
         function carregarAvaliações(atletaId) {
             const lista = document.getElementById('lista-Avaliações-modal');
-            lista.innerHTML = '<div class="text-center text-slate-400 py-4">Carregando avalia�es...</div>';
+            lista.innerHTML = '<div class="text-center text-slate-400 py-4">Carregando avaliações...</div>';
 
             fetch(`/treinador/Avaliações/${atletaId}`)
                 .then(res => res.json())
@@ -631,9 +649,9 @@
                                     <span class="text-xs bg-slate-900 text-slate-400 px-2 py-1 rounded">Peso: ${av.peso || '--'} kg | BF: ${av.bf_percentual || '--'}%</span>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2 text-xs text-slate-300">
-                                    <div>T�rax: ${av.medida_torax || '--'} cm</div>
+                                    <div>Tórax: ${av.medida_torax || '--'} cm</div>
                                     <div>Cintura: ${av.medida_cintura || '--'} cm</div>
-                                    <div>Abd�men: ${av.medida_abdomen || '--'} cm</div>
+                                    <div>Abdômen: ${av.medida_abdomen || '--'} cm</div>
                                     <div>Quadril: ${av.medida_quadril || '--'} cm</div>
                                 </div>
                                 ${av.observacoes_gerais ? `<div class="mt-2 text-xs italic text-slate-400 border-t border-slate-600/50 pt-1">Obs: ${av.observacoes_gerais}</div>` : ''}
@@ -660,12 +678,12 @@
                     form.reset();
                     carregarAvaliações(atletaId); // recarrega a lista
                 } else {
-                    alert('Erro ao salvar avalia�ǜo.');
+                    alert('Erro ao salvar avaliação.');
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert('Erro de conexǜo ao salvar.');
+                alert('Erro de conexão ao salvar.');
             });
         }
     </script>

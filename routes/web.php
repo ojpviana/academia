@@ -90,6 +90,9 @@ Route::middleware(['auth'])->group(function () {
         
         // Configurações Gerais
         Route::post('/admin/configuracoes/horario', [ConfiguracaoController::class, 'salvarHorario']);
+        // Turnos
+        Route::post('/admin/configuracoes/turnos', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'storeTurno']);
+        Route::delete('/admin/configuracoes/turnos/{id}', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'destroyTurno']);
 
         // Modalidades Extras e Turmas
         Route::get('/admin/modalidades', [ModalidadeController::class, 'index']);
@@ -103,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
         // Vitrine Virtual (Loja)
         Route::get('/admin/loja', [LojaController::class, 'index']);
         Route::post('/admin/loja', [LojaController::class, 'store']);
+        Route::put('/admin/loja/{id}', [LojaController::class, 'update']);
         Route::delete('/admin/loja/{id}', [LojaController::class, 'destroy']);
     });
 

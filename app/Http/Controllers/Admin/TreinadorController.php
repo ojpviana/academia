@@ -233,4 +233,25 @@ class TreinadorController extends Controller
     }
 
     // Templates de treino: ver App\Http\Controllers\Treinador\TemplateController
+    public function pagar(\Illuminate\Http\Request $request, $id)
+    {
+        $request->validate([
+            'valor' => 'required|numeric|min:0.01',
+            'data_pagamento' => 'required|date',
+        ]);
+
+        $treinador = \App\Models\Treinador::with('user')->findOrFail($id);
+
+        \App\Models\Despesa::create([
+            'descricao' => 'Pagamento Treinador: ' . ($treinador->user->name ?? 'Desconhecido'),
+            'valor' => $request->valor,
+            'data_pagamento' => $request->data_pagamento,
+            'categoria' => 'Folha de Pagamento',
+        ]);
+
+        $treinador->data_ultimo_pagamento = $request->data_pagamento;
+        $treinador->save();
+
+        return back()->with('success', 'Pagamento do treinador registrado com sucesso!');
+    }
 }

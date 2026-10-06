@@ -148,110 +148,59 @@ class AlunoController extends Controller
         return redirect('/admin/dashboard')->with('success', 'Atleta removido com sucesso.');
     }
 
-    public function registrarPagamento(Request $request)
+        public function registrarPagamento(Request $request)
     {
-        // Validaï¿½ï¿½oÂ£o rigorosa para evitar dados financeiros inconsistentes no banco
+        // Validação rigorosa
         $request->validate([
             'atleta_id' => 'required|integer',
             'valor' => 'required|numeric',
             'data_pagamento' => 'required|date',
         ]);
 
+        $dataPagamento = \Carbon\Carbon::parse($request->data_pagamento);
+
+        // TRAVA DE SEGURANÇA: Impedir duplicidade no mês/ano
+        $pagamentoExistente = \App\Models\AlunoPagamento::where('atleta_id', $request->atleta_id)
+            ->whereMonth('data_pagamento', $dataPagamento->month)
+            ->whereYear('data_pagamento', $dataPagamento->year)
+            ->first();
+
+        if ($pagamentoExistente) {
+            return back()->withErrors(['erro' => 'Este aluno já possui um pagamento para o mês informado. Se estiver ANTECIPANDO uma mensalidade, altere o campo "Data" no modal para o próximo mês.']);
+        }
+
         // Cria o registro financeiro
-        AlunoPagamento::create([
+        \App\Models\AlunoPagamento::create([
             'atleta_id' => $request->atleta_id,
             'valor' => $request->valor,
             'data_pagamento' => $request->data_pagamento,
             'status' => $request->status ?? 'Pago',
         ]);
 
-        // AUTOMATIZAÃƒâ€¡ÃƒÆ’O DA REGRA DE NEGÃƒâ€œCIO: Destrava o acesso do aluno
-        $atleta = Atleta::find($request->atleta_id);
+        // Destrava o acesso do aluno e joga o vencimento +1 mês
+        $atleta = \App\Models\Atleta::find($request->atleta_id);
         if ($atleta) {
+            $baseVencimento = $atleta->data_vencimento ? \Carbon\Carbon::parse($atleta->data_vencimento) : $dataPagamento->copy();
+            
             $atleta->update([
                 'status' => 'Ativo',
-                'data_vencimento' => \Carbon\Carbon::parse($request->data_pagamento)->addMonth()->toDateString()
+                'data_vencimento' => $baseVencimento->addMonth()->toDateString()
             ]);
         }
 
-        // Retorna para a tela principal
-        return redirect('/admin/dashboard')->with('success', 'Pagamento registrado e acesso do aluno renovado!');
+        return back()->with('success', 'Pagamento registrado com sucesso!');
     }
 
     public function restaurar($id)
     {
-        $atleta = Atleta::where('idAtleta', $id)->firstOrFail();
-
-        $atleta->excluido = 0; // Volta a ser atevo
-        $atleta->excluido_date = null; // Limpa a date de exclusÃƒÂ£o
-        $atleta->save();
-
-        return redirect('/admin/dashboard');
-    }
-
-    // MÃƒÂ©todo para salvar o Treinador
-    public function salvarTreinador(\Illuminate\Http\Request $request)
-    {
-        $dados = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string',
-            'cpf' => 'nullable|string',
-            'rg' => 'nullable|string',
-            'data_nascimento' => 'nullable|date',
-            'telefone' => 'nullable|string',
-            'endereco_completo' => 'nullable|string',
-            'cref' => ['required', 'string', 'regex:/^\d{6}-[GP]\/[A-Z]{2}$/'],
-            'funcao' => 'nullable|string',
-            'tipo_vinculo' => 'nullable|string',
-            'turno_horario' => 'nullable|string',
-            'dados_bancarios' => 'nullable|string'
-        ], [
-            'cref.regex' => 'Insira um CREF vÃƒÂ¡lido'
-        ]);
-
-        // 1. Cria o Login do Professor
-        $user = \App\Models\User::create([
-            'name' => $dados['name'],
-            'email' => $dados['email'],
-            'password' => \Illuminate\Support\Facades\Hash::make($dados['password']),
-            'role' => 'treinador'
-        ]);
-
-        // 2. Cria a Ficha do Professor
-        $treinador = \App\Models\Treinador::create([
-            'user_id' => $user->id,
-            'cpf' => $dados['cpf'] ?? null,
-            'rg' => $dados['rg'] ?? null,
-            'data_nascimento' => $dados['data_nascimento'] ?? null,
-            'telefone' => $dados['telefone'] ?? null,
-            'endereco_completo' => $dados['endereco_completo'] ?? null,
-            'cref' => $dados['cref'],
-            'funcao' => $dados['funcao'] ?? 'Professor',
-            'tipo_vinculo' => $dados['tipo_vinculo'] ?? 'PJ',
-            'turno_horario' => $dados['turno_horario'] ?? null,
-            'dados_bancarios' => $dados['dados_bancarios'] ?? null
-        ]);
-
-
-        return back()->with('success', 'Treinador cadastrado com sucesso!');
-    }
-    // Funï¿½ï¿½oÂ£o para salvar a justificateva silenciosamente via AJAX
-    public function registrarHistorico(\Illuminate\Http\Request $request)
-    {
-        try {
-            \App\Models\HistoricoTreino::create([
-                'atleta_id' => $request->atleta_id,
-                'treino_de' => $request->treino_de,     // Nova coluna
-                'treino_para' => $request->treino_para, // Nova coluna (antigo nome_treino)
-                'observacao' => $request->observacao
-            ]);
-
-            return response()->json(['success' => true]);
-
-        } catch (\Exception $e) {
-            // Em caso de erro no banco, ele devolve o motivo exata
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        $atleta = \App\Models\Atleta::onlyTrashed()->where('idAtleta', $id)->firstOrFail();
+        
+        $atleta->restore();
+        if ($atleta->user) {
+            $atleta->user->restore();
         }
+        
+        return back()->with('success', 'Atleta restaurado com sucesso e movido de volta para a lista de ativos!');
     }
+
 }

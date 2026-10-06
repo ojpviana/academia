@@ -35,6 +35,32 @@ class LojaController extends Controller
         return back()->with('success', 'Produto cadastrado na vitrine!');
     }
 
+        public function update(Request $request, $id)
+    {
+        $produto = Produto::findOrFail($id);
+        
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'preco' => 'required|numeric|min:0',
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        $dados = $request->only(['nome', 'descricao', 'preco']);
+
+        if ($request->hasFile('imagem')) {
+            // Remove old image if replacing
+            if ($produto->imagem_path && Storage::disk('public')->exists($produto->imagem_path)) {
+                Storage::disk('public')->delete($produto->imagem_path);
+            }
+            $dados['imagem_path'] = $request->file('imagem')->store('produtos', 'public');
+        }
+
+        $produto->update($dados);
+
+        return back()->with('success', 'Produto atualizado com sucesso!');
+    }
+
     public function destroy($id)
     {
         $produto = Produto::findOrFail($id);

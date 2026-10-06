@@ -79,13 +79,25 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="font-bold text-white capitalize">{{ $atleta->nome }}</span>
+                                                                                <div class="font-bold text-white capitalize">{{ $atleta->nome }}</div>
+                                        @php
+                                            $obj = $atleta->objetivo;
+                                            if (!$obj && is_array($atleta->anamnese) && isset($atleta->anamnese['objetivo'])) {
+                                                $obj = $atleta->anamnese['objetivo'];
+                                            }
+                                            $obj = $obj ?: 'Não definido';
+                                        @endphp
+                                        <div class="mt-2">
+                                            <span class="bg-blue-900 text-blue-300 text-xs px-2 py-1 rounded-full border border-blue-700 font-medium">
+                                                Alvo: {{ $obj }}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-slate-400">
                                         {{ $atleta->idade }} anos
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <a href="/treinador?atleta={{ $atleta->idAtleta }}&nome={{ urlencode($atleta->nome) }}" class="inline-block bg-orange-600 hover:bg-orange-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors shadow shadow-orange-900/20">
+                                        <a href="/treinador?atleta={{ $atleta->idAtleta }}&nome={{ urlencode($atleta->nome) }}&objetivo={{ urlencode($obj) }}" class="inline-block bg-orange-600 hover:bg-orange-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors shadow shadow-orange-900/20">
                                             Abrir Ficha
                                         </a>
                                     </td>
