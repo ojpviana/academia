@@ -47,7 +47,7 @@
                             <a href="/admin/dashboard?status=inativos" class="text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 px-3 py-2 rounded-lg transition-colors font-bold flex-1 sm:flex-none text-center">
                                 Inativos
                             </a>
-                            <button x-data @click="$dispatch('abrir-modal-aluno-novo')" class="text-sm bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg transition-colors font-bold flex-1 sm:flex-none text-center">
+                            <button x-data @click="$dispatch('abrir-modal-aluno')" class="text-sm bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg transition-colors font-bold flex-1 sm:flex-none text-center">
                                 + Novo Aluno
                             </button>
                         @endif

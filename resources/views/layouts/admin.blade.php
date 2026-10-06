@@ -8,7 +8,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-300 font-sans flex h-screen overflow-hidden relative w-full">
+<body x-data class="bg-slate-900 text-slate-300 font-sans flex h-screen overflow-hidden relative w-full">
 
     <div id="sidebar-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-900/80 z-30 hidden transition-opacity md:hidden"></div>
 
@@ -28,14 +28,14 @@
                 Dashboard
             </a>
 
-                                    <button x-data @click="$dispatch('abrir-modal-aluno-novo')" class="w-full flex items-center px-4 py-3 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg transition-colors text-left">
-                <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
-                Cadastrar Aluno
-            </button>
-            <button x-data @click="$dispatch('abrir-modal-treinador-novo')" class="w-full flex items-center px-4 py-3 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg transition-colors text-left">
-                <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                Cadastrar Treinador
-            </button>
+                                    <button type="button" @click="$dispatch('abrir-modal-aluno')" class="w-full text-left flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-slate-700 rounded-lg cursor-pointer transition-all focus:outline-none">
+    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+    Cadastrar Aluno
+</button>
+            <button type="button" @click="$dispatch('abrir-modal-treinador')" class="w-full text-left flex items-center px-4 py-3 text-gray-300 hover:text-white hover:bg-slate-700 rounded-lg cursor-pointer transition-all focus:outline-none">
+    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+    Cadastrar Treinador
+</button>
 
             <a href="/admin/financeiro" class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/financeiro') ? 'bg-slate-700 text-orange-400 border-l-4 border-orange-500' : 'hover:bg-slate-700 text-slate-400 hover:text-white' }}">
                 <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>

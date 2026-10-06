@@ -1,4 +1,4 @@
-<div id="modal-cadastro-aluno" x-data="{ open: false }" x-show="open" @abrir-modal-aluno.window="open = true" @abrir-modal-aluno-novo.window="open = true; document.getElementById('titleModalAtleta').innerText = 'Cadastrar Novo Atleta'; document.getElementById('formAtleta').action = '/admin/alunos'; document.getElementById('methodAtleta').value = 'POST'; document.getElementById('btnSubmitAtleta').innerHTML = '<svg class=\'w-5 h-5 mr-2\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M5 13l4 4L19 7\'></path></svg> Salvar Cadastro'; document.getElementById('formAtleta').reset(); if(typeof switchTab === 'function') switchTab(1);" style="display: none;" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center z-50 px-4 overflow-y-auto pt-10 pb-10">
+<div x-data="{ open: false }" x-show="open" @abrir-modal-aluno.window="open = true" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden w-full max-w-4xl shadow-2xl relative my-auto">
         <div class="modal-body-scroll p-8 relative">
         <button @click="open = false" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-700/50 p-2 rounded-full transition-colors focus:outline-none">
@@ -324,7 +324,7 @@
 </form>
     </div>
 </div>
-      <div id="modal-cadastro-treinador" x-data="{ open: false }" x-show="open" @abrir-modal-treinador.window="open = true" @abrir-modal-treinador-novo.window="open = true; document.getElementById('tituloModalTreinador').innerText = 'Cadastrar Treinador'; document.getElementById('formTreinador').action = '/admin/treinadores'; document.getElementById('metodoTreinador').innerHTML = ''; document.getElementById('formTreinador').reset(); document.getElementById('treinador_password').required = true;" style="display: none;" class="fixed inset-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center z-50 px-4 overflow-y-auto py-10">
+      <div x-data="{ open: false }" x-show="open" @abrir-modal-treinador.window="open = true" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden w-full max-w-4xl shadow-2xl relative my-auto">
         <div class="modal-body-scroll p-8 relative">
             <button @click="open = false" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-700/50 p-2 rounded-full">
